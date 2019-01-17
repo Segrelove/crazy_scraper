@@ -104,10 +104,7 @@ def get_deputies_first_names
     first_name = names.map do |x|
         x.split.first
     end
-    last_name = names.map do |x|
-        x.rpartition(" ").last
-    end
-    return last_name
+    return first_name
 end
 
 ### RECUPERATION DES NOMS DES DEPUTES
@@ -122,11 +119,12 @@ def get_deputies_last_names
 end
 
 
+
 def get_deputy_email
-    n = get_deputy_urls.count
+    # n = get_deputy_urls.count
     i = 0
     deputy_email = []
-    while i < n
+    while i < 5
         doc = Nokogiri::HTML(open("https://www.nosdeputes.fr#{get_deputy_urls[i]}"))
         doc.xpath('//ul[2]//li//ul//li[1]/a').each do |node|
             deputy_email.push(node.text)
@@ -136,8 +134,7 @@ def get_deputy_email
     end
     # return deputy_email # => count ??
 
-
-    names = get_deputy_names
+    names = get_deputies_first_names
     result_scrap = names.map.with_index do |name, index|
         new_hash = {}
         new_hash[name] = deputy_email[index]
@@ -145,9 +142,12 @@ def get_deputy_email
     end
 
     return result_scrap
+
 end
 
+p get_deputy_email
 
+# p get_deputy_email
 # def testing
 #     prenoms = ["max", "jiad", "bams"]
 #     noms = ["LS", "LP", "AHHa"]
