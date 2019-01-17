@@ -7,7 +7,7 @@ def scrap_coin_market_cap
     doc = Nokogiri::HTML(open("https://coinmarketcap.com/all/views/all/"))
     
     names = []
-    doc.xpath('//tr/td[3]').each do |node|
+    doc.xpath('//tr/td[3]').each do |node| 
         names.push(node.text)
     end
 
@@ -29,9 +29,6 @@ def scrap_coin_market_cap
     return result_scrap
 end
 
-
-
-
 def get_townhall_urls
     doc = Nokogiri::HTML(open("http://annuaire-des-mairies.com/val-d-oise.html"))
 
@@ -44,29 +41,43 @@ def get_townhall_urls
         x[1..-1]
     end
     return result_url
-    # return result_url.count
 end
 
-# p get_townhall_urls
+def get_townhall_names
+    doc = Nokogiri::HTML(open("http://annuaire-des-mairies.com/val-d-oise.html"))
+
+    names_of_town = []
+    
+    doc.xpath('//tr[2]//p/a').each do |node|
+        names_of_town.push(node.text)
+    end
+    return names_of_town
+end
 
 def get_townhall_email
     n = get_townhall_urls.count
     i = 0
-    puts "LET THE SCRAP BEGGGIIIIIIIIIIIIN"
-    final_result = []
+    emails = []
     while i < n
         doc = Nokogiri::HTML(open("http://annuaire-des-mairies.com#{get_townhall_urls[i].to_s}"))
-        emails = []
-        doc.xpath('//section[2]/div/table/tbody/tr[4]/td[2]').map do |node|
+        result = doc.xpath('//section[2]/div/table/tbody/tr[4]/td[2]').map do |node|
             emails.push(node.text)
         end
-        puts emails
-        final_result << emails
+        p emails[i]
         i += 1
     end
-    puts "OVER !"
-    return final_result
-    # return "http://annuaire-des-mairies.com#{get_townhall_urls[0].to_s}"
-end
+    # Data importante : emails.count # => 185
 
-p get_townhall_email
+    # Itère dans Names en prenant le même index que prices (car ils sont symetriques)
+    # On créé un hash vide
+    # On associe name et son index, qui est égal à l'index de l'array prices
+    # On itère le hash
+    names = get_townhall_names
+    result_scrap = names.map.with_index do |name, index|
+        new_hash = {}
+        new_hash[name] = emails[index]
+        new_hash
+    end
+
+    return result_scrap
+end
