@@ -81,3 +81,87 @@ def get_townhall_email
 
     return result_scrap
 end
+
+### EXERICE DES DEPUTES ###
+
+def get_deputy_urls
+    doc = Nokogiri::HTML(open("https://www.nosdeputes.fr/deputes"))
+
+    deputy_urls = []
+
+    doc.xpath('//tr/td[1]/a/@href').each do |node|
+        deputy_urls.push(node.text)
+    end
+
+    return deputy_urls # => 205 urls
+end
+
+### RECUPERATION DES PRENOMS DES DEPUTES ###
+
+def get_deputies_first_names
+    names = get_deputy_urls.map {|x| x.delete!("/").gsub('-',' ')}
+    # return names #=> count 205 noms
+    first_name = names.map do |x|
+        x.split.first
+    end
+    last_name = names.map do |x|
+        x.rpartition(" ").last
+    end
+    return last_name
+end
+
+### RECUPERATION DES NOMS DES DEPUTES
+
+def get_deputies_last_names
+    names = get_deputy_urls.map {|x| x.delete!("/").gsub('-',' ')}
+    # return names #=> count 205 noms
+    last_name = names.map do |x|
+        x.rpartition(" ").last
+    end
+    return last_name
+end
+
+
+def get_deputy_email
+    n = get_deputy_urls.count
+    i = 0
+    deputy_email = []
+    while i < n
+        doc = Nokogiri::HTML(open("https://www.nosdeputes.fr#{get_deputy_urls[i]}"))
+        doc.xpath('//ul[2]//li//ul//li[1]/a').each do |node|
+            deputy_email.push(node.text)
+        end
+        p deputy_email[i]
+        i += 1
+    end
+    # return deputy_email # => count ??
+
+
+    names = get_deputy_names
+    result_scrap = names.map.with_index do |name, index|
+        new_hash = {}
+        new_hash[name] = deputy_email[index]
+        new_hash
+    end
+
+    return result_scrap
+end
+
+
+# def testing
+#     prenoms = ["max", "jiad", "bams"]
+#     noms = ["LS", "LP", "AHHa"]
+#     mails = ["mia@gmail.com", "jiaad.com","ouech.com"]
+    
+#     # h = mails.map {|email| {:email => email}}
+#     # h2 = 
+#     # h3 = noms.map {|nom| {:nom => nom}}
+#     # z = { **h, **h2, **h3 }
+
+#     a = Hash[prenoms.map {|key, value| [:first_name, key]}]
+#     return a
+# end
+
+# p testing
+
+#

@@ -11,4 +11,12 @@ describe "scrap get_townhall should return something" do
         expect(get_townhall_urls).not_to be_nil
         expect(get_townhall_names).not_to be_nil
     end
+end 
+
+describe "scrap get_deputy_email" do 
+    it "should return something MDR" do
+        expect(get_deputies_first_names).not_to be_nil
+        expect(get_deputies_last_names).not_to be_nil
+        expect(get_deputy_urls).not_to be_nil
+    end
 end
