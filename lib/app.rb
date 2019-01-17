@@ -16,10 +16,6 @@ def scrap_coin_market_cap
         prices.push(node.text)
     end
 
-    # Itère dans Names en prenant le même index que prices (car ils sont symetriques)
-    # On créé un hash vide
-    # On associe name et son index, qui est égal à l'index de l'array prices
-    # On itère le hash
     result_scrap = names.map.with_index do |name, index|
         new_hash = {}
         new_hash[name] = prices[index]
@@ -66,12 +62,7 @@ def get_townhall_email
         p emails[i]
         i += 1
     end
-    # Data importante : emails.count # => 185
 
-    # Itère dans Names en prenant le même index que prices (car ils sont symetriques)
-    # On créé un hash vide
-    # On associe name et son index, qui est égal à l'index de l'array prices
-    # On itère le hash
     names = get_townhall_names
     result_scrap = names.map.with_index do |name, index|
         new_hash = {}
@@ -93,14 +84,13 @@ def get_deputy_urls
         deputy_urls.push(node.text)
     end
 
-    return deputy_urls # => 205 urls
+    return deputy_urls
 end
 
 ### RECUPERATION DES PRENOMS DES DEPUTES ###
 
 def get_deputies_first_names
     names = get_deputy_urls.map {|x| x.delete!("/").gsub('-',' ')}
-    # return names #=> count 205 noms
     first_name = names.map do |x|
         x.split.first
     end
@@ -111,7 +101,6 @@ end
 
 def get_deputies_last_names
     names = get_deputy_urls.map {|x| x.delete!("/").gsub('-',' ')}
-    # return names #=> count 205 noms
     last_name = names.map do |x|
         x.rpartition(" ").last
     end
@@ -119,12 +108,12 @@ def get_deputies_last_names
 end
 
 
-
-def get_deputy_email
-    # n = get_deputy_urls.count
+## VERSION QUI FONCTIONNE A MERVEILLE SANS HASH DEMANDE
+def get_deputy_email_V1
+    n = get_deputy_urls.count
     i = 0
     deputy_email = []
-    while i < 5
+    while i < n
         doc = Nokogiri::HTML(open("https://www.nosdeputes.fr#{get_deputy_urls[i]}"))
         doc.xpath('//ul[2]//li//ul//li[1]/a').each do |node|
             deputy_email.push(node.text)
@@ -132,36 +121,49 @@ def get_deputy_email
         p deputy_email[i]
         i += 1
     end
-    # return deputy_email # => count ??
 
     names = get_deputies_first_names
     result_scrap = names.map.with_index do |name, index|
         new_hash = {}
-        new_hash[name] = deputy_email[index]
+        new_hash[name] = deputy_emails[index]
         new_hash
     end
-
     return result_scrap
-
 end
 
-p get_deputy_email
+# p get_deputy_email_V1
+##VERSION QUI FONCTIONNE HYPEEER LENTEMENT AVEC UN BUG DE LOOP MAIS LE HASH EST RESPECTE
+## IL FAUT APPELER "end_result_of_hash_for_deputies" POUR LA FAIRE FONCTIONNER
+def get_deputy_email_V2
+    n = get_deputy_urls.count
+    i = 0
+    deputy_email = []
+    while i < n
+        doc = Nokogiri::HTML(open("https://www.nosdeputes.fr#{get_deputy_urls[i]}"))
+        doc.xpath('//ul[2]//li//ul//li[1]/a').each do |node|
+            deputy_email.push(node.text)
+        end
+        p deputy_email[i]
+        i += 1
+    end
+    return deputy_email
+end
 
-# p get_deputy_email
-# def testing
-#     prenoms = ["max", "jiad", "bams"]
-#     noms = ["LS", "LP", "AHHa"]
-#     mails = ["mia@gmail.com", "jiaad.com","ouech.com"]
+def end_result_of_hash_for_deputies
+    n = get_deputy_email_V2.count
+    new_arr = []
+    i = 0
+    while i < n
+        arr = [get_deputies_first_names[i], get_deputies_last_names[i], get_deputy_email_V2[i]]
+        new_arr << arr
+        i += 1
+    end
     
-#     # h = mails.map {|email| {:email => email}}
-#     # h2 = 
-#     # h3 = noms.map {|nom| {:nom => nom}}
-#     # z = { **h, **h2, **h3 }
+    array_of_hashes = []
+    new_arr.each { |record| array_of_hashes << {'first_name' => record[0], 'last_name' => record[1], 'email' => record[2]} }
+    return array_of_hashes
+end
 
-#     a = Hash[prenoms.map {|key, value| [:first_name, key]}]
-#     return a
-# end
+p end_result_of_hash_for_deputies
 
-# p testing
 
-#
