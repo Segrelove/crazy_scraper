@@ -24,6 +24,7 @@ def scrap_coin_market_cap
 
     return result_scrap
 end
+p scrap_coin_market_cap
 
 def get_townhall_urls
     doc = Nokogiri::HTML(open("http://annuaire-des-mairies.com/val-d-oise.html"))
@@ -72,6 +73,8 @@ def get_townhall_email
 
     return result_scrap
 end
+
+# p get_townhall_email
 
 ### EXERICE DES DEPUTES ###
 
@@ -163,7 +166,3 @@ def end_result_of_hash_for_deputies
     new_arr.each { |record| array_of_hashes << {'first_name' => record[0], 'last_name' => record[1], 'email' => record[2]} }
     return array_of_hashes
 end
-
-p end_result_of_hash_for_deputies
-
-
